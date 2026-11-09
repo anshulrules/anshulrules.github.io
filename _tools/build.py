@@ -119,7 +119,7 @@ years = sorted({r["date"][:4] for r in rows}, reverse=True)
 a = [HEAD.format(t="아카이브")]
 a.append('<p><a href="index.html">그린피그</a> &gt; 아카이브</p>\n')
 a.append("<p>\n" + " | ".join(f'<a href="#y{y}">{y}</a>' for y in years) +
-         '\n<br>\n<a href="#other">기타 공연·낭독</a> | <a href="#awards">수상</a>\n</p>\n')
+         '\n<br>\n<a href="#other">기타 공연·낭독</a> | <a href="#awards">수상</a> | <a href="chronology.html">인쇄용 연보</a>\n</p>\n')
 a.append("<!-- 새 공연은 해당 연도 맨 아래에 한 줄 추가. 형식: 날짜 <a href=\"w번호.html\">〈제목〉</a> 작·연출 / 공연장 - 비고<br> -->\n")
 for y in years:
     lines = []
@@ -186,6 +186,71 @@ pp = pp[:a] + mid + pp[b:]
 pp = pp.replace("<p>이름을 누르면 참여한 작품이 나옵니다.</p>\n", "")
 open(f"{SITE}/people.html", "w").write(pp)
 print(len(people), "people indexed")
+
+
+# ---- 인쇄용 공연 연보(chronology.html) ----
+arch = open(f"{SITE}/archive.html").read()
+def tail_lines(anchor):
+    blk = arch[arch.index(f'<h3 id="{anchor}">'):]
+    blk = blk[blk.index("<p>") + 3: blk.index("</p>")]
+    return [l.replace("<br>", "").strip() for l in blk.strip().splitlines() if l.strip()]
+OTHER_RE = re.compile(r"^(\S+) 〈(.+?)〉\s*(.*?) / (.*?)(?: - (.*))?$")
+def cell(x):
+    return f"<td>{x}</td>"
+c = [HEAD.format(t="공연 연보")]
+c.append('<p class="noprint"><a href="index.html">그린피그</a> &gt; <a href="archive.html">아카이브</a> &gt; 공연 연보</p>\n')
+c.append(f"<h2>그린피그 공연 연보 {years[-1]}–{years[0]}</h2>")
+c.append('<p class="noprint">인쇄하거나 PDF로 저장하면 지원서 첨부용으로 쓸 수 있습니다.</p>\n')
+c.append('<div class="wide"><table class="chrono">\n<tr><th>연도</th><th>기간</th><th>작품</th><th>작·연출</th><th>공연장</th><th>비고</th></tr>')
+for y in years:
+    first = True
+    for r in rows:
+        if r["date"][:4] != y: continue
+        d = r["date"][5:] if r["date"].startswith(y + ".") else r["date"]
+        c.append("<tr>" + cell(y if first else "") + cell(d) + cell(f"〈{r['title']}〉") + cell(r["credit"]) + cell(r["venue"]) + cell(r["note"]) + "</tr>")
+        first = False
+c.append("</table></div>\n")
+c.append("<h3>기타 공연·낭독</h3>")
+c.append('<div class="wide"><table class="chrono">\n<tr><th>기간</th><th>작품</th><th>작·연출</th><th>공연장</th><th>비고</th></tr>')
+for l in tail_lines("other"):
+    m = OTHER_RE.match(l)
+    if m:
+        c.append("<tr>" + "".join(cell(x or "") for x in (m.group(1), f"〈{m.group(2)}〉", m.group(3), m.group(4), m.group(5))) + "</tr>")
+c.append("</table></div>\n")
+c.append("<h3>수상</h3>\n<p>\n" + "<br>\n".join(tail_lines("awards")) + "\n</p>\n")
+c.append('<hr class="noprint">\n<p>그린피그 · greenpig.kr@gmail.com · wearegreenpig.github.io</p>\n')
+open(f"{SITE}/chronology.html", "w").write("\n".join(c))
+
+# ---- 첫 페이지 "N년 전 오늘" ----
+def span(d):
+    """'2012.4.19–29' → (2012, 4, 19, 끝 연, 끝 월, 끝 일). 일자를 알 수 없으면 None."""
+    m = re.match(r"^(\d{4})\.(\d{1,2})\.(\d{1,2})(.*)$", d)
+    if not m: return None
+    y, mo, da, rest = int(m.group(1)), int(m.group(2)), int(m.group(3)), m.group(4)
+    e = re.match(r"^–(?:(\d{4})\.)?(?:(\d{1,2})\.)?(\d{1,2})$", rest.strip())
+    if e:
+        return (y, mo, da, int(e.group(1) or y), int(e.group(2) or mo), int(e.group(3)))
+    return (y, mo, da, y, mo, da)
+data = []
+for r in rows:
+    sp = span(r["date"])
+    if sp:
+        data.append(list(sp) + [r["title"], page(r["slug"]), r["venue"].split(";")[0]])
+import json as _json
+script = ("<!-- 오늘 -->\n<p id=\"today\" hidden></p>\n<script>\n"
+  "// 지난 공연 가운데 오늘 날짜에 막을 올렸거나 공연 중이던 것을 보여 준다 (build.py가 자동 생성)\n"
+  "(function(){var P=" + _json.dumps(data, ensure_ascii=False) + ";\n"
+  "var t=new Date(),Y=t.getFullYear(),M=t.getMonth()+1,D=t.getDate(),open=[],run=[];\n"
+  "P.forEach(function(p){if(p[0]>=Y)return;var n=Y-p[0],s=new Date(p[0],p[1]-1,p[2]),e=new Date(p[3],p[4]-1,p[5]),d=new Date(p[0],M-1,D),d2=new Date(p[0]+1,M-1,D);\n"
+  "var x=function(k){return k+'년 전 오늘, <a href=\"'+p[7]+'\">〈'+p[6]+'〉</a> ';};\n"
+  "if(p[1]==M&&p[2]==D)open.push(x(n)+'개막 ('+p[8]+')');else if(d>s&&d<=e)run.push(x(n)+'공연 중 ('+p[8]+')');else if(d2>s&&d2<=e&&p[0]+1<Y)run.push(x(n-1)+'공연 중 ('+p[8]+')');});\n"
+  "var l=open.concat(run).slice(0,2);if(l.length){var el=document.getElementById('today');el.innerHTML=l.join('<br>');el.hidden=false;}})();\n"
+  "</script>\n<!-- /오늘 -->\n")
+ix = open(f"{SITE}/index.html").read()
+ix = re.sub(r"<!-- 오늘 -->.*?<!-- /오늘 -->\n", "", ix, flags=re.S)
+k = ix.rindex("<hr>")                       # 소식 아래, 이메일 위
+ix = ix[:k] + script + "\n" + ix[k:]
+open(f"{SITE}/index.html", "w").write(ix)
 
 # 공통 머리말과 최종 수정 날짜
 import finish
