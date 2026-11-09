@@ -43,7 +43,10 @@ def describe(name, text):
     m = re.search(r"</h2>\s*<p>(.*?)</p>", text, re.S)
     return short(plain(m.group(1))) if m else DESC["index.html"]
 
-def core(text):  # 날짜 비교용: 자동으로 넣는 부분을 뺀 본문
+CSS_RE = re.compile(r'<link rel="stylesheet" href="(/?)style\.css(?:\?v=\w+)?">')
+
+def core(text):  # 날짜 비교용: 자동으로 넣는 부분을 뺀 본문 (스타일 버전 표시도 뺀다)
+    text = CSS_RE.sub(r'<link rel="stylesheet" href="\1style.css">', text)
     return DATE_RE.sub("", META_RE.sub("", text)).replace('<html lang="ko">\n', "")
 
 def main():
@@ -53,6 +56,9 @@ def main():
         state = json.load(open(STATE))
     except Exception:
         state = {}
+    # style.css가 바뀌면 주소 뒤 번호(?v=)도 바뀌어, 브라우저가 예전 스타일을 붙들고 있지 않게 한다
+    css_v = hashlib.sha1(open(os.path.join(SITE, "style.css"), "rb").read()).hexdigest()[:8]
+    css_link = f'<link rel="stylesheet" href="style.css?v={css_v}">\n'
     for path in sorted(glob.glob(os.path.join(SITE, "*.html"))):
         name = os.path.basename(path)
         text = open(path, encoding="utf-8").read()
@@ -84,8 +90,8 @@ def main():
                 '<meta name="twitter:card" content="summary_large_image">\n'
                 "<!-- /공통 머리말 -->\n")
         out = body.replace("<!doctype html>\n", '<!doctype html>\n<html lang="ko">\n', 1)
-        out = out.replace('<link rel="stylesheet" href="style.css">\n',
-                          '<link rel="stylesheet" href="style.css">\n' + meta, 1)
+        out = out.replace('<link rel="stylesheet" href="style.css">\n', css_link + meta, 1)
+        out = out.replace('<link rel="stylesheet" href="/style.css">', f'<link rel="stylesheet" href="/style.css?v={css_v}">', 1)
         # '발행일' 글자는 눈에 띄지 않는 '발행인' 페이지 링크
         out = out.rstrip("\n") + f'\n\n<p class="updated"><a class="hid" href="colophon.html">발행일</a> {date}</p>\n'
         if out != text:
