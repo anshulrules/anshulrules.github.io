@@ -17,6 +17,45 @@ for r in rows:
         order.append(r["slug"])
     works[r["slug"]]["rows"].append(r)
 
+
+# ---- 사람별 참여 기록 색인 ----
+NAME_RE = re.compile(r"^[가-힣]{2,4}$")
+NOT_PERSON = {"스탭서울", "워크룸", "보통현상", "그린피그", "온스테이지", "공동창작", "공동구성", "공동재구성", "공동연구"}
+people = {}  # 이름 -> {작품번호: [역할…]}
+
+def credit(name, slug, role):
+    name = name.strip()
+    if NAME_RE.match(name) and name not in NOT_PERSON:
+        roles = people.setdefault(name, {}).setdefault(slug, [])
+        if role not in roles:
+            roles.append(role)
+
+def parse_credit_line(slug, text):
+    """'윤영선 원작, 전성현 글쓰기, 윤한솔 연출' 같은 줄에서 이름과 역할을 뽑는다."""
+    text = re.sub(r"〈[^〉]*〉\s*", "", text)
+    for role, names in re.findall(r"(\S+)\(([^)]*)\)", text):   # 공동연구(김현, 박수빈, …)
+        for n in names.split(","):
+            credit(n, slug, role)
+    text = re.sub(r"\S+\([^)]*\)", "", text)
+    for piece in re.split(r",\s*| · ", text):
+        words = piece.split()
+        if len(words) >= 2:
+            for n in " ".join(words[:-1]).split("·"):
+                credit(n, slug, words[-1])
+
+for r in rows:
+    parse_credit_line(r["slug"], r["credit"])
+for slug, ex in EXTRA.items():
+    for role, names in ex.get("크레딧", []):
+        for n in names.split(","):
+            n = n.strip()
+            m = re.match(r"^(\S+)\((.+)\)$", n)            # 전선우(데스데모나)
+            credit(m.group(1) if m else n, slug, f"{role}({m.group(2)})" if m else role)
+
+def linkify(text):
+    return re.sub(r"(?<![가-힣])([가-힣]{2,4})(?![가-힣])",
+                  lambda m: f'<a href="who.html#{m.group(1)}">{m.group(1)}</a>' if m.group(1) in people else m.group(1), text)
+
 def page(slug):
     return f"w{slug}.html"
 
@@ -49,7 +88,7 @@ for i, slug in enumerate(order):
     out = [HEAD.format(t=t)]
     out.append(f'<p><a href="index.html">그린피그</a> &gt; <a href="archive.html">아카이브</a> &gt; {t}</p>\n')
     out.append(f"<h2>〈{t}〉</h2>")
-    out.append(f"<p>{w['credit']}</p>\n")
+    out.append(f"<p>{linkify(w['credit'])}</p>\n")
     if os.path.exists(f"{SITE}/w{slug}.jpg"):
         out.append(f'<p><img src="w{slug}.jpg" alt="〈{t}〉 포스터" width="300"></p>\n')
     else:
@@ -60,7 +99,7 @@ for i, slug in enumerate(order):
     if "수상" in ex:
         out.append("<h3>수상</h3>\n<p>\n" + "<br>\n".join(ex["수상"]) + "\n</p>\n")
     if "크레딧" in ex:
-        out.append("<h3>크레딧</h3>\n<p>\n" + "<br>\n".join(f"{k}: {v}" for k, v in ex["크레딧"]) + "\n</p>\n")
+        out.append("<h3>크레딧</h3>\n<p>\n" + "<br>\n".join(f"{k}: {linkify(v)}" for k, v in ex["크레딧"]) + "\n</p>\n")
     if "리뷰" in ex:
         out.append("<h3>리뷰·기사</h3>\n<p>\n" + "<br>\n".join(rev_line(x) for x in ex["리뷰"]) + "\n</p>\n")
     if "비평" in ex:
@@ -112,6 +151,43 @@ t = t[:a] + block + t[b:]
 t = t.replace('<a href="#reviews">관객 리뷰</a>', '<a href="#reviews">관객 리뷰·기사</a>')
 open(f"{SITE}/texts.html", "w").write(t)
 print(len(groups), "review groups")
+
+
+# ---- 참여 기록 페이지(who.html)와 사람 페이지의 이름 링크 ----
+INITIALS = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ"
+def initial(n):
+    return INITIALS[(ord(n[0]) - 0xAC00) // 588]
+names = sorted(people)
+groups_by_init = {}
+for n in names:
+    groups_by_init.setdefault(initial(n), []).append(n)
+pos = {slug: i for i, slug in enumerate(order)}
+h = [HEAD.format(t="참여 기록")]
+h.append('<p><a href="index.html">그린피그</a> &gt; <a href="people.html">사람</a> &gt; 참여 기록</p>\n')
+h.append("<h2>참여 기록</h2>")
+h.append("<p>그린피그 공연의 크레딧에 이름이 오른 사람들입니다. 최근 작품부터 적었습니다.<br>\n"
+         "작·연출은 모든 작품에, 출연과 스태프는 크레딧이 정리된 작품에만 들어 있습니다. 자료가 더해지면 늘어납니다.</p>\n")
+h.append("<p>" + " ".join(f'<a href="#{c}">{c}</a>' for c in INITIALS if c in groups_by_init) + "</p>\n")
+for c in INITIALS:
+    if c not in groups_by_init: continue
+    h.append(f'<h3 id="{c}">{c}</h3>')
+    for n in groups_by_init[c]:
+        works_of = sorted(people[n], key=lambda s: pos[s], reverse=True)
+        lines = [f'{works[s]["rows"][0]["date"][:4]} <a href="{page(s)}">〈{works[s]["title"]}〉</a> {", ".join(people[n][s])}' for s in works_of]
+        h.append(f'<p id="{n}"><b>{n}</b><br>\n' + "<br>\n".join(lines) + "\n</p>")
+h.append('\n<hr>\n<p><a href="people.html">사람으로 돌아가기</a></p>\n')
+open(f"{SITE}/who.html", "w").write("\n".join(h))
+
+pp = open(f"{SITE}/people.html").read()
+pp = re.sub(r'<a href="who\.html#[^"]*">([^<]*)</a>', r"\1", pp)          # 기존 링크 풀기
+a, b = pp.index("<h2>사람</h2>"), pp.index("<hr>")
+mid = re.sub(r"(?m)^(?!<)(.+)$", lambda m: linkify(m.group(1)), pp[a:b])   # 이름 줄만
+mid = mid.replace('<p>\n<a href="who.html">전체 참여 기록</a>\n</p>\n\n', "")
+mid = mid.rstrip("\n") + '\n\n<p>\n<a href="who.html">전체 참여 기록</a>\n</p>\n\n'
+pp = pp[:a] + mid + pp[b:]
+pp = pp.replace("<h2>사람</h2>\n", "<h2>사람</h2>\n<p>이름을 누르면 참여한 작품이 나옵니다.</p>\n", 1) if "이름을 누르면" not in pp else pp
+open(f"{SITE}/people.html", "w").write(pp)
+print(len(people), "people indexed")
 
 # 공통 머리말과 최종 수정 날짜
 import finish
