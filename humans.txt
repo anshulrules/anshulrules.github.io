@@ -6,5 +6,5 @@
 /* SITE */
 처음 연 날: 2026.11
 언어: 한국어
-만든 방식: HTML, CSS, Python
-연락: greenpig.kr@gmail.com
+참고: piero scaruffi (scaruffi.com)
+연락: chowoongchul@gmail.com

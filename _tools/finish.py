@@ -82,7 +82,8 @@ def main():
         out = body.replace("<!doctype html>\n", '<!doctype html>\n<html lang="ko">\n', 1)
         out = out.replace('<link rel="stylesheet" href="style.css">\n',
                           '<link rel="stylesheet" href="style.css">\n' + meta, 1)
-        out = out.rstrip("\n") + f'\n\n<p class="updated">발행일 {date}</p>\n'
+        # '발행일' 글자는 눈에 띄지 않는 '만든 사람' 페이지 링크
+        out = out.rstrip("\n") + f'\n\n<p class="updated"><a class="hid" href="colophon.html">발행일</a> {date}</p>\n'
         if out != text:
             open(path, "w", encoding="utf-8").write(out)
     json.dump(state, open(STATE, "w"), ensure_ascii=False, indent=0, sort_keys=True)

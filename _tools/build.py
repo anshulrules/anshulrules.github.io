@@ -126,13 +126,12 @@ for i, slug in enumerate(order):
         caps = ex.get("포스터", [])
         if len(files) == 1 and not caps:
             out.append(f'<p><img src="{files[0]}" alt="〈{t}〉 포스터" width="300"></p>\n')
-        else:  # 포스터가 여러 장이면 나란히, 아래에 언제·어디 포스터인지 적는다
+        else:  # 포스터가 여러 장이면 나란히 (언제·어디 포스터인지는 마우스를 올리면 보인다)
             cells = []
             for k, f in enumerate(files):
                 cap = caps[k] if k < len(caps) else ""
                 alt = f"〈{t}〉 포스터" + (f" ({cap})" if cap else "")
-                cells.append(f'<span><a href="{f}"><img src="{f}" alt="{alt}" width="200"></a>'
-                             + (f'<br><small>{cap}</small>' if cap else "") + "</span>")
+                cells.append(f'<span><a href="{f}"><img src="{f}" alt="{alt}" title="{cap}" width="200"></a></span>')
             out.append('<p class="posters">\n' + "\n".join(cells) + "\n</p>\n")
     else:
         out.append(f'<!-- 포스터가 생기면 w{slug}.jpg 로 저장하고 아래 줄의 주석을 풀어 주세요 -->\n<!-- <p><img src="w{slug}.jpg" alt="〈{t}〉 포스터" width="300"></p> -->\n')
