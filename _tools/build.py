@@ -56,6 +56,35 @@ def linkify(text):
     return re.sub(r"(?<![가-힣])([가-힣]{2,4})(?![가-힣])",
                   lambda m: f'<a href="who.html#{m.group(1)}">{m.group(1)}</a>' if m.group(1) in people else m.group(1), text)
 
+
+# ---- 극장·작가 색인 준비 ----
+VENUE_SAME = {"대학로 정보소극장": "정보소극장", "두산아트센터 스페이스111": "두산아트센터 Space111",
+              "명동 삼일로창고극장": "삼일로창고극장"}
+NOT_VENUE = {"전국 12개 지역 순회"}
+ABROAD = {"도쿄": "도쿄", "요코하마": "요코하마", "뮌헨": "뮌헨", "말레이시아": "말레이시아", "선전": "선전"}
+def venues_of(v):
+    out = []
+    for x in re.split(r";\s*|,\s*", v):
+        x = VENUE_SAME.get(x.strip(), x.strip())
+        if x and x not in NOT_VENUE:
+            out.append(x)
+    return out
+def vid(v):
+    return "v-" + re.sub(r"\s+", "-", v)
+WRITER_ROLES = {"작", "원작", "작가", "글쓰기", "대본", "글", "작·연출"}
+writers = {}  # 이름 -> {작품번호: [역할]}
+for r in rows:
+    t = re.sub(r"〈[^〉]*〉\s*", "", r["credit"])
+    t = re.sub(r"\S+\([^)]*\)", "", t)
+    for piece in re.split(r",\s*| · ", t):
+        words = piece.split()
+        if len(words) >= 2 and words[-1] in WRITER_ROLES:
+            for n in " ".join(words[:-1]).split("·"):
+                n = n.strip()
+                if n and n not in NOT_PERSON:
+                    roles = writers.setdefault(n, {}).setdefault(r["slug"], [])
+                    if words[-1] not in roles: roles.append(words[-1])
+
 def page(slug):
     return f"w{slug}.html"
 
@@ -77,7 +106,7 @@ def perf_line(r, main_title):
     s = r["date"]
     if r["title"] != main_title:
         s += f" 〈{r['title']}〉"
-    s += f" / {r['venue']}"
+    s += " / " + ", ".join(f'<a href="theaters.html#{vid(v)}">{v}</a>' for v in venues_of(r["venue"])) if venues_of(r["venue"]) else f" / {r['venue']}"
     if r["note"]:
         s += f" - {r['note']}"
     return s
@@ -109,7 +138,7 @@ for i, slug in enumerate(order):
         p = order[i-1]; nav.append(f'이전: <a href="{page(p)}">〈{works[p]["title"]}〉</a>')
     if i < len(order) - 1:
         n = order[i+1]; nav.append(f'다음: <a href="{page(n)}">〈{works[n]["title"]}〉</a>')
-    out.append("<hr>\n<p>" + " | ".join(nav) + '<br>\n<a href="archive.html">아카이브로 돌아가기</a></p>\n')
+    out.append("<hr>\n<p>" + " | ".join(nav) + '<br>\n<a href="archive.html">아카이브로 돌아가기</a> | <a class="random" href="archive.html">아무 작품이나</a></p>\n')
     open(f"{SITE}/{page(slug)}", "w").write("\n".join(out))
 
 # 아카이브 다시 만들기: 연도별 목록 + 기존 기타·수상 블록 유지
@@ -119,7 +148,12 @@ years = sorted({r["date"][:4] for r in rows}, reverse=True)
 a = [HEAD.format(t="아카이브")]
 a.append('<p><a href="index.html">그린피그</a> &gt; 아카이브</p>\n')
 a.append("<p>\n" + " | ".join(f'<a href="#y{y}">{y}</a>' for y in years) +
-         '\n<br>\n<a href="#other">기타 공연·낭독</a> | <a href="#awards">수상</a> | <a href="chronology.html">인쇄용 연보</a>\n</p>\n')
+         '\n<br>\n<a href="#other">기타 공연·낭독</a> | <a href="#awards">수상</a> | <a href="theaters.html">극장별</a> | <a href="writers.html">작가별</a> | <a href="chronology.html">인쇄용 연보</a> | <a class="random" href="archive.html">아무 작품이나</a>\n</p>\n')
+all_venues = {v for r in rows for v in venues_of(r["venue"])}
+abroad = {k for r in rows for k in ABROAD if k in r["venue"]}
+STATS = (f'<p>{years[-1]}–{years[0]}, {int(years[0]) - int(years[-1])}년. 작품 {len(order)}편, 공연 기록 {len(rows)}건, '
+         f'극장 {len(all_venues)}곳(해외 {len(abroad)}개 도시), 크레딧에 오른 이름 {{N_PEOPLE}}명.</p>\n')
+a.append(STATS)
 a.append("<!-- 새 공연은 해당 연도 맨 아래에 한 줄 추가. 형식: 날짜 <a href=\"w번호.html\">〈제목〉</a> 작·연출 / 공연장 - 비고<br> -->\n")
 for y in years:
     lines = []
@@ -251,6 +285,40 @@ ix = re.sub(r"<!-- 오늘 -->.*?<!-- /오늘 -->\n", "", ix, flags=re.S)
 k = ix.rindex("<hr>")                       # 소식 아래, 이메일 위
 ix = ix[:k] + script + "\n" + ix[k:]
 open(f"{SITE}/index.html", "w").write(ix)
+
+
+# ---- 극장별(theaters.html), 작가별(writers.html), 아무 작품이나(random.js) ----
+by_venue = {}
+for r in rows:
+    for v in venues_of(r["venue"]):
+        by_venue.setdefault(v, []).append(r)
+tv = [HEAD.format(t="극장별")]
+tv.append('<p><a href="index.html">그린피그</a> &gt; <a href="archive.html">아카이브</a> &gt; 극장별</p>\n')
+tv.append("<h2>극장별</h2>")
+for v, rs in sorted(by_venue.items(), key=lambda kv: (-len(kv[1]), kv[0])):
+    lines = [f'{r["date"]} <a href="{page(r["slug"])}">〈{r["title"]}〉</a>' + (f' - {r["note"]}' if r["note"] else "") for r in rs]
+    tv.append(f'<p id="{vid(v)}"><b>{v}</b> ({len(rs)})<br>\n' + "<br>\n".join(lines) + "\n</p>")
+tv.append('\n<hr>\n<p><a href="archive.html">아카이브로 돌아가기</a></p>\n')
+open(f"{SITE}/theaters.html", "w").write("\n".join(tv))
+
+wv = [HEAD.format(t="작가별")]
+wv.append('<p><a href="index.html">그린피그</a> &gt; <a href="archive.html">아카이브</a> &gt; 작가별</p>\n')
+wv.append("<h2>작가별</h2>")
+for n, ws in sorted(writers.items(), key=lambda kv: (-len(kv[1]), kv[0])):
+    lines = [f'{works[s]["rows"][0]["date"][:4]} <a href="{page(s)}">〈{works[s]["title"]}〉</a> {", ".join(ws[s])}'
+             for s in sorted(ws, key=lambda s: pos[s])]
+    name = f'<a href="who.html#{n}">{n}</a>' if n in people else n
+    wv.append(f'<p><b>{name}</b> ({len(ws)})<br>\n' + "<br>\n".join(lines) + "\n</p>")
+wv.append('\n<hr>\n<p><a href="archive.html">아카이브로 돌아가기</a></p>\n')
+open(f"{SITE}/writers.html", "w").write("\n".join(wv))
+
+open(f"{SITE}/random.js", "w").write(
+    "// '아무 작품이나' 링크를 무작위 작품 페이지로 바꾼다 (build.py가 자동 생성)\n"
+    "var W=" + _json.dumps([page(s) for s in order]) + ";\n"
+    "document.querySelectorAll('a.random').forEach(function(a){a.href=W[Math.floor(Math.random()*W.length)];});\n")
+
+ar = open(f"{SITE}/archive.html").read().replace("{N_PEOPLE}", str(len(people)))
+open(f"{SITE}/archive.html", "w").write(ar)
 
 # 공통 머리말과 최종 수정 날짜
 import finish
