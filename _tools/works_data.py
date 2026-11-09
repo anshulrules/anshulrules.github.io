@@ -499,3 +499,52 @@ add("68", 크레딧=[("작·연출", "주은길"), ("출연", "김원태, 김효
     ("주최·주관", "주은길, 그린피그")])
 add("07", 포스터=["2010 국립극장 별오름극장"])
 add("66", 크레딧=[("작", "안톤 체홉"), ("연출", "주은길"), ("출연", "김원태, 김용희, 김효영, 박기원, 박수빈, 박정근, 윤자애"), ("주최", "그린피그")])
+
+# ---- 2019.8–2022.3 X 공유 링크 (2026.11.9 추가) ----
+add("13", 리뷰=[
+    ("2020.8.6", "https://m.post.naver.com/viewer/postView.nhn?volumeNo=29000538&memberNo=7039772", "6번째 재공연 소개 기사 (2020)", "네이버 포스트"),
+    ("2019.9.16", "https://darack.tistory.com/250", "관람 후기 (2019)", "티스토리"),
+    ("2019.8.23", "https://blog.naver.com/joicehjy/221625185119", "관람 후기 (2019)", B),
+    ("2019.8.20", "https://blog.naver.com/eunpiri715/221621680629", "관람 후기 (2019)", B),
+    ("2019.8.20", "https://cafe.naver.com/3sacting/131515", "관람 후기 (2019)", "네이버 카페")])
+add("35", 리뷰=[
+    ("2019.11.21", "https://blog.naver.com/dpvlrgkdldy1/221713914117", "관람 후기", B),
+    ("2019.10.18", "https://blog.naver.com/kimockran/221681018754", "관람 후기", B),
+    ("2019.10.11", "https://cafe.naver.com/culturebloom/772060", "관람 후기", "네이버 카페"),
+    ("2019.10.7", "https://blog.naver.com/smail0719/221670582085", "관람 후기", B),
+    ("2019.10.5", "https://blog.naver.com/pjg5134/221669205635", "관람 후기", B),
+    ("2019.10.4", "https://n.news.naver.com/article/018/0004471775", "벽산희곡상 수상작 공연 기사", "이데일리"),
+    ("2019.9.16", "http://newdaily.co.kr/site/data/html/2019/09/16/2019091600051.html", "벽산희곡상 수상작 공연 기사", "뉴데일리")])
+add("40", 리뷰=[
+    ("2020.5.8", "https://blog.naver.com/saerapin/221950223618", "〈한국연극〉 5월호 비평", B),
+    ("2020.5.1", "https://ttis.kr/2020/04/7950/", "기사", "Today's Theater in Seoul"),
+    ("2020.4.17", "https://webzine.e-stc.or.kr/01_guide/actreview_view.asp?SearchKey=&SearchValue=&rd=&flag=READ&Idx=1527", "비평", "서울연극센터 웹진"),
+    ("2020.4.2", "https://blog.naver.com/rarokim/221885733306", "관람 후기", B)])
+add("43", 리뷰=[
+    ("2021.7.5", "https://blog.naver.com/purun8/222421293449", "관람 후기", B),
+    ("2021.6.29", "https://blog.naver.com/yidongil70/222412516964", "관람 후기", B),
+    ("2021.6.24", "https://blog.naver.com/alien17/222408798526", "관람 후기", B),
+    ("2021.6.22", "https://www.khan.co.kr/article/202106221716001", "기사", "경향신문"),
+    ("2021.6.20", "https://n.news.naver.com/article/079/0003518216", "리뷰", "노컷뉴스"),
+    ("2021.6.6", "https://n.news.naver.com/article/079/0003511369", "기사", "노컷뉴스"),
+    ("2021.5.25", "http://newdaily.co.kr/site/data/html/2021/05/25/2021052500039.html", "신작 소개 기사", "뉴데일리")])
+add("45", 리뷰=[
+    ("2022.3.14", "https://blog.naver.com/sky1013q/222583152755", "관람 후기", B),
+    ("2022.1.5", "https://blog.naver.com/cosmopolitan/222613326268", "온라인 중계 관람 후기", B),
+    ("2021.12.23", "https://blog.naver.com/4413547/222594014400", "관람 후기", B),
+    ("2021.12.1", "https://blog.naver.com/isl1945/222582071429", "관람 후기", B),
+    ("2021.11.28", "https://blog.naver.com/thewindrises/222580969131", "관람 후기", B),
+    ("2021.11.26", "https://blog.naver.com/yidongil70/222579013602", "관람 후기", B),
+    ("2021.11.25", "https://blog.naver.com/pjyulsub1210/222578950381", "관람 후기", B),
+    ("2021.11.22", "https://www.unipress.co.kr/news/articleView.html?idxno=4933", "비평", "대학지성 In&Out"),
+    ("2021.11.20", "https://blog.naver.com/muldrida/222573798490", "비평", B),
+    ("2021.11.15", "https://n.news.naver.com/article/032/0003110015", "기사", "경향신문"),
+    ("2021.11.15", "https://n.news.naver.com/article/079/0003574723", "리뷰", "노컷뉴스"),
+    ("2021.11.13", "https://blog.naver.com/monzxx/222567295606", "관람 후기", B),
+    ("2021.11.13", "https://blog.naver.com/bo5852/222566891168", "관람 후기", B),
+    ("2021.11.12", "https://www.vop.co.kr/A00001602564.html", "비평", "민중의소리"),
+    ("2021.11.11", "https://blog.naver.com/purun8/222565128683", "관람 후기", B),
+    ("2021.11.5", "https://blog.naver.com/gokams_kopis/222558621929", "소개 글", "공연예술통합전산망 블로그")])
+add("17", 리뷰=[
+    ("2022.3.27", "https://blog.naver.com/fly8495/222684477294", "관람 후기", B),
+    ("2022.3.16", "https://www.vop.co.kr/A00001610044.html", "기사", "민중의소리")])

@@ -182,7 +182,7 @@ for i, slug in enumerate(order):
     if "크레딧" in ex:
         out.append("<h3>크레딧</h3>\n<p>\n" + "<br>\n".join(f"{k}: {linkify(v, k)}" for k, v in ex["크레딧"]) + "\n</p>\n")
     if "리뷰" in ex:
-        out.append("<h3>리뷰·기사</h3>\n<p>\n" + "<br>\n".join(rev_line(x) for x in ex["리뷰"]) + "\n</p>\n")
+        out.append("<h3>리뷰·기사</h3>\n<p>\n" + "<br>\n".join(rev_line(x) for x in sorted(ex["리뷰"], key=lambda x: dkey(x[0]), reverse=True)) + "\n</p>\n")
     if "비평" in ex:
         out.append("<h3>비평</h3>\n<p>\n" + "<br>\n".join(ex["비평"]) + "\n</p>\n")
     nav = []
