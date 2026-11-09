@@ -21,7 +21,7 @@
 },
 "index.html": {
 "date": "2026.11.9",
-"hash": "6f537ee467b9a0bf83f9f32709d772cd514125dd"
+"hash": "488b51e3ad45cf1c7706a86b17c80fbc2669540d"
 },
 "people.html": {
 "date": "2026.11.9",
@@ -29,7 +29,7 @@
 },
 "texts.html": {
 "date": "2026.11.9",
-"hash": "ac157001b55c24597a32f6ec1f7118d51c58caa9"
+"hash": "bf3097c856a7b3acdcf4f70870850473d57feb12"
 },
 "theaters.html": {
 "date": "2026.11.9",
@@ -101,7 +101,7 @@
 },
 "w17.html": {
 "date": "2026.11.9",
-"hash": "3cd2550043d821fdcc9ad50daa243127fe743e21"
+"hash": "22ba372a74e451c349ce341fec606d1036fd14ac"
 },
 "w18.html": {
 "date": "2026.11.9",
@@ -117,23 +117,23 @@
 },
 "w2024-02.html": {
 "date": "2026.11.9",
-"hash": "15b3d797936ae80f05581a9c2a56376aa926f643"
+"hash": "0e942f4e2776de242e7ff3141a371daa15cee313"
 },
 "w2024-05.html": {
 "date": "2026.11.9",
-"hash": "b53db4b7978c5b0ded51baab9a2634acef7c0c9f"
+"hash": "c5ba6940eacc5634cd2bfa4823073e1519a99b7c"
 },
 "w2024-07.html": {
 "date": "2026.11.9",
-"hash": "9f7a85a0c2a46a0e87a9f127a912a080f2c72e96"
+"hash": "81daa4f0f2fa48afcfff5a13db8270b1bb6a1053"
 },
 "w2024-09.html": {
 "date": "2026.11.9",
-"hash": "bf00d20a8c73f3b546dc10bf677d4a58ef438290"
+"hash": "306ee1c9027fb4a797c1119bf85f1a19d6f3bc07"
 },
 "w2024-11.html": {
 "date": "2026.11.9",
-"hash": "dbb7761e05be6fe096b35e7b9b2b0fa9d2de83f4"
+"hash": "62ddf4df856c898c67627f8a1a3431bc906f0e1c"
 },
 "w21.html": {
 "date": "2026.11.9",
@@ -205,7 +205,7 @@
 },
 "w38.html": {
 "date": "2026.11.9",
-"hash": "c09dda83f60a630fcf341d51cfd73f37bf26ce97"
+"hash": "f4bc5af81acf6c86ea7f0ab435bff6cd5d080a8b"
 },
 "w40.html": {
 "date": "2026.11.9",
@@ -237,7 +237,7 @@
 },
 "w47.html": {
 "date": "2026.11.9",
-"hash": "f8d97cc036029585ffca48c0fac6e7e32a528b1b"
+"hash": "61befa54a94e1b7feab2dffd98c305118cc4888d"
 },
 "w48.html": {
 "date": "2026.11.9",
@@ -257,11 +257,11 @@
 },
 "w52.html": {
 "date": "2026.11.9",
-"hash": "b463b292e5b409fa5ed638747199957f8d69d09d"
+"hash": "65f7c8519bb95a310e382cc14bbecb8a47e90efb"
 },
 "w53.html": {
 "date": "2026.11.9",
-"hash": "1ef2f2e87c92bb0e8a744c0c18ee409143c2c74d"
+"hash": "fbf564707d32dc3e29f5b605d0f5b6619950a15a"
 },
 "w54.html": {
 "date": "2026.11.9",
@@ -277,19 +277,19 @@
 },
 "w57.html": {
 "date": "2026.11.9",
-"hash": "4141c4908babdd299016a01cb3961eb5d8888529"
+"hash": "aa2cdf9be60b391273304f88a2d60c1bdeda12bd"
 },
 "w58.html": {
 "date": "2026.11.9",
-"hash": "8c3b11889db93ba4a61541d94eebef37611876b5"
+"hash": "613d4779570a528a5badc2b7c6636242675f14a4"
 },
 "w59.html": {
 "date": "2026.11.9",
-"hash": "4da4313d6a99a9eebf2272b4a323871848b336e3"
+"hash": "aab4e43bea986a08108f1f1edd290ec664800a32"
 },
 "w60.html": {
 "date": "2026.11.9",
-"hash": "ff0796bf2a3858b9e79f3bddd2b3421fdd6d61e9"
+"hash": "362a5853a55b244be0c4033a2860ee8a045ddd08"
 },
 "w61.html": {
 "date": "2026.11.9",
@@ -297,11 +297,11 @@
 },
 "w62.html": {
 "date": "2026.11.9",
-"hash": "03c585f28804052b19d6748fb894ec057003f80f"
+"hash": "473bfdec105a41ed39f5ffeb2a08026f83755c80"
 },
 "w63.html": {
 "date": "2026.11.9",
-"hash": "bb9156b0b4cb9e15b16517b4c3eec45f5aa564bd"
+"hash": "890a9a0bf132920eb54e51070237c0241e8b9f5c"
 },
 "w64.html": {
 "date": "2026.11.9",
@@ -329,11 +329,11 @@
 },
 "w70.html": {
 "date": "2026.11.9",
-"hash": "a63dde185dada9cf8b5923065ebc69b660ab7a0c"
+"hash": "75cbc26ffc5bed495d22e0aa54ac213737a0563d"
 },
 "w71.html": {
 "date": "2026.11.9",
-"hash": "b8ce12f5467b7cac1fc44511e4575e5fe7d048c1"
+"hash": "2e28218af7e663fc683c18a75f648ea9dbbc3985"
 },
 "who.html": {
 "date": "2026.11.9",
