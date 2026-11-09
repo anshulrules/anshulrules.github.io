@@ -21,40 +21,71 @@ for r in rows:
 # ---- 사람별 참여 기록 색인 ----
 NAME_RE = re.compile(r"^[가-힣]{2,4}$")
 NOT_PERSON = {"스탭서울", "워크룸", "보통현상", "그린피그", "온스테이지", "공동창작", "공동구성", "공동재구성", "공동연구"}
-people = {}  # 이름 -> {작품번호: [역할…]}
+people = {}  # 사람 키 -> {작품번호: {역할: {연도…}}}
 
-def credit(name, slug, role):
+# 동명이인: (이름, 역할에 들어 있는 말) -> 구분된 키. 새로 생기면 여기에 한 줄 추가.
+SAME_NAME = [("박정근", "사진", "박정근(사진)"),
+             ("박현지", "출연", "박현지(배우)"), ("박현지", "배우", "박현지(배우)")]
+
+def person_key(name, role):
+    for n, word, key in SAME_NAME:
+        if name == n and word in role:
+            return key
+    return name
+
+def anchor(key):
+    return key.replace("(", "-").replace(")", "")
+
+def show(key):
+    return key.replace("(", " (")
+
+YEAR_RE = re.compile(r"(?:^|\()(20\d\d)\b\s*")
+
+def credit(name, slug, role, year):
     name = name.strip()
     if NAME_RE.match(name) and name not in NOT_PERSON:
-        roles = people.setdefault(name, {}).setdefault(slug, [])
-        if role not in roles:
-            roles.append(role)
+        m = YEAR_RE.search(role)                       # '출연(2022)', '2026 출연' 같은 연도 표시
+        if m:
+            year = m.group(1)
+            role = (role[:m.start()] + role[m.end():]).replace("()", "").strip(" ()") or role
+            role = re.sub(r"\(\s*", "(", role).replace("( ", "(")
+        key = person_key(name, role)
+        people.setdefault(key, {}).setdefault(slug, {}).setdefault(role, set()).add(year)
 
-def parse_credit_line(slug, text):
+def parse_credit_line(slug, text, year):
     """'윤영선 원작, 전성현 글쓰기, 윤한솔 연출' 같은 줄에서 이름과 역할을 뽑는다."""
     text = re.sub(r"〈[^〉]*〉\s*", "", text)
     for role, names in re.findall(r"(\S+)\(([^)]*)\)", text):   # 공동연구(김현, 박수빈, …)
         for n in names.split(","):
-            credit(n, slug, role)
+            credit(n, slug, role, year)
     text = re.sub(r"\S+\([^)]*\)", "", text)
     for piece in re.split(r",\s*| · ", text):
         words = piece.split()
         if len(words) >= 2:
             for n in " ".join(words[:-1]).split("·"):
-                credit(n, slug, words[-1])
+                credit(n, slug, words[-1], year)
 
 for r in rows:
-    parse_credit_line(r["slug"], r["credit"])
+    parse_credit_line(r["slug"], r["credit"], r["date"][:4])
+first_year = {}
+for r in rows:
+    first_year.setdefault(r["slug"], r["date"][:4])
 for slug, ex in EXTRA.items():
-    for role, names in ex.get("크레딧", []):
+    cr = ex.get("크레딧", [])
+    # 연도가 안 적힌 크레딧은 같은 자료의 '출연(연도)'를 따르고, 없으면 첫 공연 연도
+    base = next((m.group(1) for role, _ in cr for m in [re.search(r"(20\d\d)", role)] if m and "출연" in role),
+                first_year.get(slug, ""))
+    for role, names in cr:
         for n in names.split(","):
             n = n.strip()
             m = re.match(r"^(\S+)\((.+)\)$", n)            # 전선우(데스데모나)
-            credit(m.group(1) if m else n, slug, f"{role}({m.group(2)})" if m else role)
+            credit(m.group(1) if m else n, slug, f"{role}({m.group(2)})" if m else role, base)
 
-def linkify(text):
-    return re.sub(r"(?<![가-힣])([가-힣]{2,4})(?![가-힣])",
-                  lambda m: f'<a href="who.html#{m.group(1)}">{m.group(1)}</a>' if m.group(1) in people else m.group(1), text)
+def linkify(text, role=""):
+    def one(m):
+        key = person_key(m.group(1), role)
+        return f'<a href="who.html#{anchor(key)}">{m.group(1)}</a>' if key in people else m.group(1)
+    return re.sub(r"(?<![가-힣])([가-힣]{2,4})(?![가-힣])", one, text)
 
 
 # ---- 극장·작가 색인 준비 ----
@@ -141,7 +172,7 @@ for i, slug in enumerate(order):
     if "수상" in ex:
         out.append("<h3>수상</h3>\n<p>\n" + "<br>\n".join(ex["수상"]) + "\n</p>\n")
     if "크레딧" in ex:
-        out.append("<h3>크레딧</h3>\n<p>\n" + "<br>\n".join(f"{k}: {linkify(v)}" for k, v in ex["크레딧"]) + "\n</p>\n")
+        out.append("<h3>크레딧</h3>\n<p>\n" + "<br>\n".join(f"{k}: {linkify(v, k)}" for k, v in ex["크레딧"]) + "\n</p>\n")
     if "리뷰" in ex:
         out.append("<h3>리뷰·기사</h3>\n<p>\n" + "<br>\n".join(rev_line(x) for x in ex["리뷰"]) + "\n</p>\n")
     if "비평" in ex:
@@ -217,9 +248,15 @@ for c in INITIALS:
     if c not in groups_by_init: continue
     h.append(f'<h3 id="{c}">{c}</h3>')
     for n in groups_by_init[c]:
-        works_of = sorted(people[n], key=lambda s: pos[s], reverse=True)
-        lines = [f'{works[s]["rows"][0]["date"][:4]} <a href="{page(s)}">〈{works[s]["title"]}〉</a> {", ".join(people[n][s])}' for s in works_of]
-        h.append(f'<p id="{n}"><b>{n}</b><br>\n' + "<br>\n".join(lines) + "\n</p>")
+        items = []  # (최근 연도, 작품 순서, 줄)
+        for s_, roles in people[n].items():
+            by_years = {}
+            for role, ys in roles.items():
+                by_years.setdefault(tuple(sorted(ys)), []).append(role)
+            for ys, rs in by_years.items():
+                items.append((ys[-1], pos[s_], f'{", ".join(ys)} <a href="{page(s_)}">〈{works[s_]["title"]}〉</a> {", ".join(rs)}'))
+        items.sort(key=lambda x: (x[0], x[1]), reverse=True)
+        h.append(f'<p id="{anchor(n)}"><b>{show(n)}</b><br>\n' + "<br>\n".join(x[2] for x in items) + "\n</p>")
 h.append('\n<hr>\n<p><a href="people.html">사람으로 돌아가기</a></p>\n')
 open(f"{SITE}/who.html", "w").write("\n".join(h))
 
