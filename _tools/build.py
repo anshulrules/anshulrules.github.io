@@ -112,3 +112,7 @@ t = t[:a] + block + t[b:]
 t = t.replace('<a href="#reviews">관객 리뷰</a>', '<a href="#reviews">관객 리뷰·기사</a>')
 open(f"{SITE}/texts.html", "w").write(t)
 print(len(groups), "review groups")
+
+# 공통 머리말과 최종 수정 날짜
+import finish
+finish.main()

@@ -12,3 +12,4 @@ td, th { vertical-align: top; text-align: left; padding: 2px 12px 2px 0; }
 /* 다크모드에서는 흰 바탕 로고를 반전해 검은 바탕에 흰 선으로 보이게 한다 */
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .logo { filter: invert(1) } }
 :root[data-theme="dark"] .logo { filter: invert(1) }
+.updated { font-size: smaller; color: var(--rule); }
