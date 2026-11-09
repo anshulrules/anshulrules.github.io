@@ -1,0 +1,114 @@
+import sys, re, os
+sys.path.insert(0, os.path.dirname(__file__))
+from works_data import PERFORMANCES, EXTRA, YS_REVIEWS
+
+SITE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # 사이트 폴더 = _tools 의 한 단계 위
+
+rows = []
+for line in PERFORMANCES.strip().splitlines():
+    slug, date, title, credit, venue, note = line.split("|")
+    rows.append(dict(slug=slug, date=date, title=title, credit=credit, venue=venue, note=note))
+
+# 작품 순서: 첫 공연 순
+order, works = [], {}
+for r in rows:
+    if r["slug"] not in works:
+        works[r["slug"]] = {"title": r["title"], "credit": r["credit"], "rows": []}
+        order.append(r["slug"])
+    works[r["slug"]]["rows"].append(r)
+
+def page(slug):
+    return f"w{slug}.html"
+
+HEAD = """<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{t} - 그린피그</title>
+<link rel="stylesheet" href="style.css">
+"""
+
+def rev_line(x):
+    d, u, label, src = x
+    return f'{d} <a href="{u}">{label}</a>' + (f" ({src})" if src else "")
+
+def dkey(d):
+    return tuple(int(p) for p in d.split("."))
+
+def perf_line(r, main_title):
+    s = r["date"]
+    if r["title"] != main_title:
+        s += f" 〈{r['title']}〉"
+    s += f" / {r['venue']}"
+    if r["note"]:
+        s += f" - {r['note']}"
+    return s
+
+for i, slug in enumerate(order):
+    w = works[slug]; ex = EXTRA.get(slug, {})
+    t = w["title"]
+    out = [HEAD.format(t=t)]
+    out.append(f'<p><a href="index.html">그린피그</a> &gt; <a href="archive.html">아카이브</a> &gt; {t}</p>\n')
+    out.append(f"<h2>〈{t}〉</h2>")
+    out.append(f"<p>{w['credit']}</p>\n")
+    if os.path.exists(f"{SITE}/w{slug}.jpg"):
+        out.append(f'<p><img src="w{slug}.jpg" alt="〈{t}〉 포스터" width="300"></p>\n')
+    else:
+        out.append(f'<!-- 포스터가 생기면 w{slug}.jpg 로 저장하고 아래 줄의 주석을 풀어 주세요 -->\n<!-- <p><img src="w{slug}.jpg" alt="〈{t}〉 포스터" width="300"></p> -->\n')
+    if "소개" in ex:
+        out.append(f"<h3>작품 소개</h3>\n<p>{ex['소개']}</p>\n")
+    out.append("<h3>공연 기록</h3>\n<p>\n" + "<br>\n".join(perf_line(r, t) for r in w["rows"]) + "\n</p>\n")
+    if "수상" in ex:
+        out.append("<h3>수상</h3>\n<p>\n" + "<br>\n".join(ex["수상"]) + "\n</p>\n")
+    if "크레딧" in ex:
+        out.append("<h3>크레딧</h3>\n<p>\n" + "<br>\n".join(f"{k}: {v}" for k, v in ex["크레딧"]) + "\n</p>\n")
+    if "리뷰" in ex:
+        out.append("<h3>리뷰·기사</h3>\n<p>\n" + "<br>\n".join(rev_line(x) for x in ex["리뷰"]) + "\n</p>\n")
+    if "비평" in ex:
+        out.append("<h3>비평</h3>\n<p>\n" + "<br>\n".join(ex["비평"]) + "\n</p>\n")
+    nav = []
+    if i > 0:
+        p = order[i-1]; nav.append(f'이전: <a href="{page(p)}">〈{works[p]["title"]}〉</a>')
+    if i < len(order) - 1:
+        n = order[i+1]; nav.append(f'다음: <a href="{page(n)}">〈{works[n]["title"]}〉</a>')
+    out.append("<hr>\n<p>" + " | ".join(nav) + '<br>\n<a href="archive.html">아카이브로 돌아가기</a></p>\n')
+    open(f"{SITE}/{page(slug)}", "w").write("\n".join(out))
+
+# 아카이브 다시 만들기: 연도별 목록 + 기존 기타·수상 블록 유지
+old = open(f"{SITE}/archive.html").read()
+tail = old[old.index('<h3 id="other">'):]
+years = sorted({r["date"][:4] for r in rows}, reverse=True)
+a = [HEAD.format(t="아카이브")]
+a.append('<p><a href="index.html">그린피그</a> &gt; 아카이브</p>\n')
+a.append("<p>\n" + " | ".join(f'<a href="#y{y}">{y}</a>' for y in years) +
+         '\n<br>\n<a href="#other">기타 공연·낭독</a> | <a href="#awards">수상</a>\n</p>\n')
+a.append("<!-- 새 공연은 해당 연도 맨 아래에 한 줄 추가. 형식: 날짜 <a href=\"w번호.html\">〈제목〉</a> 작·연출 / 공연장 - 비고<br> -->\n")
+for y in years:
+    lines = []
+    for r in rows:
+        if r["date"][:4] != y: continue
+        s = f'{r["date"]} <a href="{page(r["slug"])}">〈{r["title"]}〉</a> {r["credit"]} / {r["venue"]}'
+        if r["note"]: s += f' - {r["note"]}'
+        lines.append(s)
+    a.append(f'<h3 id="y{y}">{y}</h3>\n<p>\n' + "<br>\n".join(lines) + "\n</p>\n")
+a.append(tail)
+open(f"{SITE}/archive.html", "w").write("\n".join(a))
+print(len(order), "works,", len(rows), "performances")
+
+# 텍스트 페이지의 관객 리뷰 부분 다시 만들기 (작품별, 최근 공유 순)
+groups = []
+for slug in order:
+    revs = EXTRA.get(slug, {}).get("리뷰")
+    if revs:
+        revs = sorted(revs, key=lambda x: dkey(x[0]), reverse=True)
+        y = works[slug]["rows"][0]["date"][:4]
+        groups.append((dkey(revs[0][0]), f'<b><a href="{page(slug)}">〈{works[slug]["title"]}〉</a> {y}</b>', revs))
+groups.append((dkey(YS_REVIEWS[0][0]), "<b>역사시비프로젝트 2024 (전반)</b>", YS_REVIEWS))
+groups.sort(key=lambda g: g[0], reverse=True)
+block = '<h3 id="reviews">관객 리뷰·기사</h3>\n<p>그린피그 X 계정(@wearegreenpig)에 공유된 글을 모았습니다. 날짜는 공유된 날입니다.</p>\n\n'
+block += "\n\n".join("<p>" + h + "<br>\n" + "<br>\n".join(rev_line(x) for x in revs) + "\n</p>" for _, h, revs in groups) + "\n\n"
+t = open(f"{SITE}/texts.html").read()
+a, b = t.index('<h3 id="reviews">'), t.index('<h3 id="criticism">')
+t = t[:a] + block + t[b:]
+t = t.replace('<a href="#reviews">관객 리뷰</a>', '<a href="#reviews">관객 리뷰·기사</a>')
+open(f"{SITE}/texts.html", "w").write(t)
+print(len(groups), "review groups")

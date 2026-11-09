@@ -1,0 +1,14 @@
+/* 그린피그 사이트 공통 스타일. 브라우저 기본 모양을 그대로 두고 색과 여백만 정한다. */
+:root { --bg: #ffffff; --fg: #000000; --link: #0000ee; --visited: #551a8b; --rule: #888888; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #121212; --fg: #e4e4e4; --link: #8ab4f8; --visited: #c58af9; --rule: #666666; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #121212; --fg: #e4e4e4; --link: #8ab4f8; --visited: #c58af9; --rule: #666666; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: serif; font-size: 16px; line-height: 1.5; margin: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 16px; }
+a { color: var(--link); } a:visited { color: var(--visited); }
+hr { border: 0; border-top: 1px solid var(--rule); }
+.wide { overflow-x: auto; }
+td, th { vertical-align: top; text-align: left; padding: 2px 12px 2px 0; }
+.logo { width: 120px; height: auto; }
+/* 다크모드에서는 흰 바탕 로고를 반전해 검은 바탕에 흰 선으로 보이게 한다 */
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .logo { filter: invert(1) } }
+:root[data-theme="dark"] .logo { filter: invert(1) }
