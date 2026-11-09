@@ -5,7 +5,7 @@
 },
 "archive.html": {
 "date": "2026.11.9",
-"hash": "1d9f6d824bc9ddf1bf4ab8d1bcd7f4631c4e88a5"
+"hash": "317d6b90f48a9b8f8607475b31694ba4dd87e330"
 },
 "chronology.html": {
 "date": "2026.11.9",
@@ -17,11 +17,11 @@
 },
 "index.html": {
 "date": "2026.11.9",
-"hash": "a29eb9f1a194f2ca4b9b3f183c0896f0272b0da4"
+"hash": "f7696d1ed59aa6e58348acb750588d7c769820ad"
 },
 "people.html": {
 "date": "2026.11.9",
-"hash": "caf8acbb57bf3c9438fa71a111845f831e9a5527"
+"hash": "0a62b849bc4b659eb29241d0eb1151803b52e0d7"
 },
 "texts.html": {
 "date": "2026.11.9",
@@ -113,7 +113,7 @@
 },
 "w2024-02.html": {
 "date": "2026.11.9",
-"hash": "6ac59a99cf4dd5fc570bd8e3753d03016735eff9"
+"hash": "49d6fb44882f978c82808d3f31691a469c3ac06b"
 },
 "w2024-05.html": {
 "date": "2026.11.9",
@@ -209,7 +209,7 @@
 },
 "w41.html": {
 "date": "2026.11.9",
-"hash": "5fe8139a9da8d054b1cae2053624f8c805691668"
+"hash": "547fcf13975c722e3a6512f1debf5482ea233f30"
 },
 "w42.html": {
 "date": "2026.11.9",
@@ -261,7 +261,7 @@
 },
 "w54.html": {
 "date": "2026.11.9",
-"hash": "70cd01f8d89fdf8ae3f8eecf0af57cb6580260ee"
+"hash": "09c3de71e377c368f8550089a3e46e82773a1269"
 },
 "w55.html": {
 "date": "2026.11.9",
@@ -269,15 +269,15 @@
 },
 "w56.html": {
 "date": "2026.11.9",
-"hash": "4bb7e7f8f56d0b4c94e8858a1c6a6a4a955553e5"
+"hash": "70cd6d8ec9e1f7d3de19820817fbbbc765317340"
 },
 "w57.html": {
 "date": "2026.11.9",
-"hash": "d7cefd4f560c3cdb010ece0950b07f25a0dd1cbf"
+"hash": "1d31025ba91308ccd57132a7cc7cd20fa40a7d4e"
 },
 "w58.html": {
 "date": "2026.11.9",
-"hash": "30925deec752965b45324e91fa4aecaf45ccbf29"
+"hash": "62b9efb03bd4959437e020e613861ac7e70c9c18"
 },
 "w59.html": {
 "date": "2026.11.9",
@@ -285,7 +285,7 @@
 },
 "w60.html": {
 "date": "2026.11.9",
-"hash": "d9c0cd947b390a21e2f8661eddc9dc0f2644e6b9"
+"hash": "c2ce5e3265439a0bede9ff870a3767a2d7b233cb"
 },
 "w61.html": {
 "date": "2026.11.9",
@@ -297,7 +297,7 @@
 },
 "w63.html": {
 "date": "2026.11.9",
-"hash": "0ed34077f309ea16470ef2d76506655a991719ef"
+"hash": "0d4418b92a7f5a22678e0bb91c23ea5772dd8c29"
 },
 "w64.html": {
 "date": "2026.11.9",
@@ -333,7 +333,7 @@
 },
 "who.html": {
 "date": "2026.11.9",
-"hash": "e1378a36f380ae787b03a8eee261c94e88cdb9f7"
+"hash": "1c8e526dfb426c886e826995890e1f0e6ae314de"
 },
 "writers.html": {
 "date": "2026.11.9",
