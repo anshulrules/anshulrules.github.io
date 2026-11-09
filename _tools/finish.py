@@ -18,7 +18,7 @@ DESC = {  # 작품 페이지가 아닌 페이지의 미리보기 설명
     "theaters.html": "그린피그가 공연한 극장들과 그곳에서 올린 작품.",
     "writers.html": "그린피그가 무대에 올린 작가들과 작품.",
     "who.html": "그린피그 공연에 참여한 사람들과 그들의 작품 목록.",
-    "colophon.html": "이 사이트를 만든 사람.",
+    "colophon.html": "이 사이트의 발행인.",
     "404.html": "찾으시는 페이지가 없습니다.",
     "archive.html": "2006년부터 지금까지 그린피그의 모든 공연 기록과 수상.",
 }
@@ -83,7 +83,7 @@ def main():
         out = body.replace("<!doctype html>\n", '<!doctype html>\n<html lang="ko">\n', 1)
         out = out.replace('<link rel="stylesheet" href="style.css">\n',
                           '<link rel="stylesheet" href="style.css">\n' + meta, 1)
-        # '발행일' 글자는 눈에 띄지 않는 '만든 사람' 페이지 링크
+        # '발행일' 글자는 눈에 띄지 않는 '발행인' 페이지 링크
         out = out.rstrip("\n") + f'\n\n<p class="updated"><a class="hid" href="colophon.html">발행일</a> {date}</p>\n'
         if out != text:
             open(path, "w", encoding="utf-8").write(out)
