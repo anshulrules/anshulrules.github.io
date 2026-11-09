@@ -71,6 +71,8 @@ def main():
                 '<link rel="apple-touch-icon" href="apple-touch-icon.png">\n'
                 '<link rel="author" href="humans.txt">\n'
                 '<script src="random.js" defer></script>\n'
+                # 로고를 눌러 고른 밤낮을 페이지가 그려지기 전에 적용 (theme.js)
+                '<script src="theme.js"></script>\n'
                 f'<meta name="description" content="{desc}">\n'
                 '<meta property="og:site_name" content="그린피그">\n'
                 f'<meta property="og:title" content="{html.escape(title, quote=True)}">\n'
