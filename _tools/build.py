@@ -39,16 +39,24 @@ def anchor(key):
 def show(key):
     return key.replace("(", " (")
 
-YEAR_RE = re.compile(r"(?:^|\()(20\d\d)\b\s*")
+
+# 같은 역할을 다르게 적은 것 (참여 기록에서만 통일)
+SAME_ROLE = {"배우": "출연", "연기": "출연", "그래픽 디자인": "그래픽디자인", "기록 촬영": "기록촬영", "조명 오퍼": "조명 오퍼레이터"}
+
+def clean_role(role):
+    """참여 기록에 쓸 역할 이름: 연도·공연명·배역 같은 괄호 속 설명과 앞의 연도를 뗀다."""
+    role = re.sub(r"\([^)]*\)", "", role)
+    role = re.sub(r"^20\d\d\s+", "", role)
+    role = role.strip() or "참여"
+    return SAME_ROLE.get(role, role)
 
 def credit(name, slug, role, year):
     name = name.strip()
     if NAME_RE.match(name) and name not in NOT_PERSON:
-        m = YEAR_RE.search(role)                       # '출연(2022)', '2026 출연' 같은 연도 표시
+        m = re.search(r"(?:^|\()(20\d\d)\b", role)      # '출연(2022)', '2026 출연' 같은 연도 표시
         if m:
             year = m.group(1)
-            role = (role[:m.start()] + role[m.end():]).replace("()", "").strip(" ()") or role
-            role = re.sub(r"\(\s*", "(", role).replace("( ", "(")
+        role = clean_role(role)
         key = person_key(name, role)
         people.setdefault(key, {}).setdefault(slug, {}).setdefault(role, set()).add(year)
 
@@ -79,7 +87,7 @@ for slug, ex in EXTRA.items():
         for n in names.split(","):
             n = n.strip()
             m = re.match(r"^(\S+)\((.+)\)$", n)            # 전선우(데스데모나)
-            credit(m.group(1) if m else n, slug, f"{role}({m.group(2)})" if m else role, base)
+            credit(m.group(1) if m else n, slug, role, base)      # 배역명은 참여 기록에 넣지 않는다
 
 def linkify(text, role=""):
     def one(m):
