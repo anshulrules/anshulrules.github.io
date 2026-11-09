@@ -1,0 +1,10 @@
+/* TEAM */
+만든 사람: 조웅철
+역할: 극단 그린피그 연출부
+장소: 서울
+
+/* SITE */
+처음 연 날: 2026.11
+언어: 한국어
+만든 방식: HTML, CSS, Python
+연락: greenpig.kr@gmail.com

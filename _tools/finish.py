@@ -18,6 +18,7 @@ DESC = {  # 작품 페이지가 아닌 페이지의 미리보기 설명
     "theaters.html": "그린피그가 공연한 극장들과 그곳에서 올린 작품.",
     "writers.html": "그린피그가 무대에 올린 작가들과 작품.",
     "who.html": "그린피그 공연에 참여한 사람들과 그들의 작품 목록.",
+    "colophon.html": "이 사이트를 만든 사람.",
     "archive.html": "2006년부터 지금까지 그린피그의 모든 공연 기록과 수상.",
 }
 
@@ -67,6 +68,7 @@ def main():
         meta = ("<!-- 공통 머리말 -->\n"
                 '<link rel="icon" href="favicon.png" type="image/png">\n'
                 '<link rel="apple-touch-icon" href="apple-touch-icon.png">\n'
+                '<link rel="author" href="humans.txt">\n'
                 '<script src="random.js" defer></script>\n'
                 f'<meta name="description" content="{desc}">\n'
                 '<meta property="og:site_name" content="그린피그">\n'
