@@ -1,4 +1,4 @@
-# 모든 페이지에 공통 머리말(언어, 탭 아이콘, 공유 미리보기)과 "최종 수정" 날짜를 넣는다.
+# 모든 페이지에 공통 머리말(언어, 탭 아이콘, 공유 미리보기)과 발행일를 넣는다.
 # build.py 끝에서 자동으로 불리며, 손으로 페이지를 고친 뒤 이것만 따로 돌려도 된다:
 #   python3 _tools/finish.py
 import os, re, json, glob, hashlib, html
@@ -76,7 +76,7 @@ def main():
         out = body.replace("<!doctype html>\n", '<!doctype html>\n<html lang="ko">\n', 1)
         out = out.replace('<link rel="stylesheet" href="style.css">\n',
                           '<link rel="stylesheet" href="style.css">\n' + meta, 1)
-        out = out.rstrip("\n") + f'\n\n<p class="updated">최종 수정 {date}</p>\n'
+        out = out.rstrip("\n") + f'\n\n<p class="updated">발행일 {date}</p>\n'
         if out != text:
             open(path, "w", encoding="utf-8").write(out)
     json.dump(state, open(STATE, "w"), ensure_ascii=False, indent=0, sort_keys=True)
