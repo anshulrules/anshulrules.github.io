@@ -143,7 +143,7 @@ for slug in order:
         groups.append((dkey(revs[0][0]), f'<b><a href="{page(slug)}">〈{works[slug]["title"]}〉</a> {y}</b>', revs))
 groups.append((dkey(YS_REVIEWS[0][0]), "<b>역사시비프로젝트 2024 (전반)</b>", YS_REVIEWS))
 groups.sort(key=lambda g: g[0], reverse=True)
-block = '<h3 id="reviews">관객 리뷰·기사</h3>\n<p>그린피그 X 계정(@wearegreenpig)에 공유된 글을 모았습니다. 날짜는 공유된 날입니다.</p>\n\n'
+block = '<h3 id="reviews">관객 리뷰·기사</h3>\n\n'
 block += "\n\n".join("<p>" + h + "<br>\n" + "<br>\n".join(rev_line(x) for x in revs) + "\n</p>" for _, h, revs in groups) + "\n\n"
 t = open(f"{SITE}/texts.html").read()
 a, b = t.index('<h3 id="reviews">'), t.index('<h3 id="criticism">')
@@ -165,8 +165,6 @@ pos = {slug: i for i, slug in enumerate(order)}
 h = [HEAD.format(t="참여 기록")]
 h.append('<p><a href="index.html">그린피그</a> &gt; <a href="people.html">사람</a> &gt; 참여 기록</p>\n')
 h.append("<h2>참여 기록</h2>")
-h.append("<p>그린피그 공연의 크레딧에 이름이 오른 사람들입니다. 최근 작품부터 적었습니다.<br>\n"
-         "작·연출은 모든 작품에, 출연과 스태프는 크레딧이 정리된 작품에만 들어 있습니다. 자료가 더해지면 늘어납니다.</p>\n")
 h.append("<p>" + " ".join(f'<a href="#{c}">{c}</a>' for c in INITIALS if c in groups_by_init) + "</p>\n")
 for c in INITIALS:
     if c not in groups_by_init: continue
@@ -185,7 +183,7 @@ mid = re.sub(r"(?m)^(?!<)(.+)$", lambda m: linkify(m.group(1)), pp[a:b])   # 이
 mid = mid.replace('<p>\n<a href="who.html">전체 참여 기록</a>\n</p>\n\n', "")
 mid = mid.rstrip("\n") + '\n\n<p>\n<a href="who.html">전체 참여 기록</a>\n</p>\n\n'
 pp = pp[:a] + mid + pp[b:]
-pp = pp.replace("<h2>사람</h2>\n", "<h2>사람</h2>\n<p>이름을 누르면 참여한 작품이 나옵니다.</p>\n", 1) if "이름을 누르면" not in pp else pp
+pp = pp.replace("<p>이름을 누르면 참여한 작품이 나옵니다.</p>\n", "")
 open(f"{SITE}/people.html", "w").write(pp)
 print(len(people), "people indexed")
 
