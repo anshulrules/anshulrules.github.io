@@ -375,6 +375,27 @@ open(f"{SITE}/random.js", "w").write(
     "var W=" + _json.dumps([page(s) for s in order]) + ";\n"
     "document.querySelectorAll('a.random').forEach(function(a){a.href=W[Math.floor(Math.random()*W.length)];});\n")
 
+# ---- 찾기(search.html)용 색인 search.js ----
+# 한 줄 = [종류, 보이는 글, 주소, 덧붙임 글, 찾을 글]
+idx = []
+for slug in order:
+    w = works[slug]; ex = EXTRA.get(slug, {})
+    yrs = sorted({r["date"][:4] for r in w["rows"]})
+    yr = yrs[0] + (f"–{yrs[-1]}" if len(yrs) > 1 else "")
+    places = ", ".join(dict.fromkeys(v for r in w["rows"] for v in venues_of(r["venue"])))
+    names = " ".join(n for role, ns in ex.get("크레딧", []) for n in ns.split(","))
+    hay = " ".join([w["title"], w["credit"], places, " ".join(r["date"] for r in w["rows"]), names, ex.get("소개", "")])
+    idx.append(["작품", f'〈{w["title"]}〉', page(slug), f'{yr}. {w["credit"]}', hay])
+for k in sorted(people):
+    idx.append(["사람", show(k), f"who.html#{anchor(k)}", f"{len(people[k])}작품", k])
+for v, rs in sorted(by_venue.items()):
+    idx.append(["극장", v, f"theaters.html#{vid(v)}", f"{len(rs)}회", v])
+for n in sorted(writers):
+    if n not in people:
+        idx.append(["작가", n, "writers.html", f"{len(writers[n])}작품", n])
+open(f"{SITE}/search.js", "w").write(
+    "// 찾기 페이지의 색인 (build.py가 자동 생성)\nvar S=" + _json.dumps(idx, ensure_ascii=False, separators=(",", ":")) + ";\n")
+
 ar = open(f"{SITE}/archive.html").read().replace("{N_PEOPLE}", str(len(people)))
 open(f"{SITE}/archive.html", "w").write(ar)
 

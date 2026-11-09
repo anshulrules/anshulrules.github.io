@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>찾기 - 그린피그</title>
+<link rel="stylesheet" href="style.css">
+<!-- 공통 머리말 -->
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="author" href="humans.txt">
+<script src="random.js" defer></script>
+<script src="theme.js"></script>
+<meta name="description" content="그린피그의 작품, 사람, 극장 찾기.">
+<meta property="og:site_name" content="그린피그">
+<meta property="og:title" content="찾기 - 그린피그">
+<meta property="og:description" content="그린피그의 작품, 사람, 극장 찾기.">
+<meta property="og:image" content="https://wearegreenpig.github.io/og.png">
+<meta property="og:url" content="https://wearegreenpig.github.io/search.html">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<!-- /공통 머리말 -->
+<script src="search.js" defer></script>
+
+<p><a href="index.html">그린피그</a> &gt; 찾기</p>
+
+<h2>찾기</h2>
+
+<form action="search.html" role="search">
+<input type="search" name="q" id="q" size="24" aria-label="찾을 말" placeholder="작품, 사람, 극장" autocomplete="off">
+<button type="submit">찾기</button>
+</form>
+
+<p class="note">작품 제목·소개·크레딧, 사람 이름, 극장 이름에서 찾습니다. 여러 낱말을 넣으면 모두 들어간 것만 나옵니다.</p>
+
+<div id="results"></div>
+
+<noscript><p>찾기는 자바스크립트가 켜져 있어야 작동합니다. <a href="archive.html">아카이브</a>나 <a href="who.html">참여 기록</a>에서 찾아보세요.</p></noscript>
+
+<script>
+// 서버 없이 이 페이지 안에서만 찾는다. 색인은 search.js (build.py가 자동 생성)
+window.addEventListener("DOMContentLoaded", function () {
+  var box = document.getElementById("q"), out = document.getElementById("results");
+  var KINDS = ["사람", "극장", "작가", "작품"];  // 짧은 묶음을 위에, 긴 작품 목록은 아래에
+  function norm(s) { return s.toLowerCase().replace(/\s+/g, ""); }
+  function esc(s) { return s.replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  var data = (window.S || []).map(function (r) { return { kind: r[0], label: r[1], href: r[2], extra: r[3], name: norm(r[1]), hay: norm(r[4]) }; });
+  function run() {
+    var q = box.value.trim();
+    try { history.replaceState(null, "", q ? "?q=" + encodeURIComponent(q) : "search.html"); } catch (e) {}
+    if (!q) { out.innerHTML = ""; return; }
+    var terms = q.split(/\s+/).map(norm);
+    var hits = data.filter(function (d) { return terms.every(function (t) { return d.hay.indexOf(t) >= 0; }); });
+    // 제목·이름에 들어간 것을 먼저
+    hits.sort(function (a, b) {
+      var ka = KINDS.indexOf(a.kind) - KINDS.indexOf(b.kind);
+      if (ka) return ka;
+      var na = terms.every(function (t) { return a.name.indexOf(t) >= 0; }) ? 0 : 1;
+      var nb = terms.every(function (t) { return b.name.indexOf(t) >= 0; }) ? 0 : 1;
+      return na - nb;
+    });
+    if (!hits.length) { out.innerHTML = "<p>찾는 것이 없습니다.</p>"; return; }
+    var html = "";
+    KINDS.forEach(function (k) {
+      var g = hits.filter(function (d) { return d.kind === k; });
+      if (!g.length) return;
+      html += "<h3>" + k + " (" + g.length + ")</h3>\n<p>" + g.map(function (d) {
+        return '<a href="' + d.href + '">' + esc(d.label) + "</a> " + esc(d.extra);
+      }).join("<br>\n") + "</p>\n";
+    });
+    out.innerHTML = html;
+  }
+  var q0 = new URLSearchParams(location.search).get("q");
+  if (q0) box.value = q0;
+  box.addEventListener("input", run);
+  box.form.addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  run();
+  if (!q0) box.focus();
+});
+</script>
+
+<p class="updated"><a class="hid" href="colophon.html">발행일</a> 2026.11.9</p>

@@ -21,11 +21,15 @@
 },
 "index.html": {
 "date": "2026.11.9",
-"hash": "1e19c630c7f14e1dd2497bc1d23b305b880c4c6e"
+"hash": "44e7c3a94c0de4f6efe087032d94883d512500a8"
 },
 "people.html": {
 "date": "2026.11.9",
 "hash": "df2dddce77099fedab82a47aa0bf5939eff624b4"
+},
+"search.html": {
+"date": "2026.11.9",
+"hash": "33f0fd5bd53665fd3fdb41e231cb16b8f5c02eb4"
 },
 "texts.html": {
 "date": "2026.11.9",
